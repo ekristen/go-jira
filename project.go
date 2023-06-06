@@ -3,6 +3,7 @@ package jira
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-querystring/query"
 )
@@ -34,6 +35,8 @@ type ProjectCategory struct {
 	Name        string `json:"name" structs:"name,omitempty"`
 	Description string `json:"description" structs:"description,omitempty"`
 }
+
+type ProjectCategoryList []ProjectCategory
 
 // Project represents a Jira Project.
 type Project struct {
@@ -179,4 +182,100 @@ func (s *ProjectService) GetPermissionSchemeWithContext(ctx context.Context, pro
 // GetPermissionScheme wraps GetPermissionSchemeWithContext using the background context.
 func (s *ProjectService) GetPermissionScheme(projectID string) (*PermissionScheme, *Response, error) {
 	return s.GetPermissionSchemeWithContext(context.Background(), projectID)
+}
+
+func (s *ProjectService) CreateProjectCategory(ctx context.Context, category *ProjectCategory) (*ProjectCategory, *Response, error) {
+	apiEndpoint := "/rest/api/3/projectCategory"
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodPost, apiEndpoint, category)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pc := new(ProjectCategory)
+	resp, err := s.client.Do(req, pc)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return nil, resp, jerr
+	}
+
+	return pc, resp, nil
+}
+
+func (s *ProjectService) GetProjectCategory(ctx context.Context, categoryID string, opts *GetQueryOptions) (*ProjectCategory, *Response, error) {
+	apiEndpoint := fmt.Sprintf("/rest/api/3/projectCategory/%s", categoryID)
+	url, err := addOptions(apiEndpoint, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pc := new(ProjectCategory)
+	resp, err := s.client.Do(req, pc)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return nil, resp, jerr
+	}
+
+	return pc, resp, nil
+}
+
+func (s *ProjectService) GetAllProjectCategories(ctx context.Context, opts *GetQueryOptions) (*ProjectCategoryList, *Response, error) {
+	apiEndpoint := "/rest/api/3/projectCategory"
+	url, err := addOptions(apiEndpoint, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pcl := new(ProjectCategoryList)
+	resp, err := s.client.Do(req, pcl)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return nil, resp, jerr
+	}
+
+	return pcl, resp, nil
+}
+
+func (s *ProjectService) UpdateProjectCategory(ctx context.Context, category *ProjectCategory, opts *UpdateQueryOptions) (*ProjectCategory, *Response, error) {
+	apiEndpoint := fmt.Sprintf("/rest/api/3/projectCategory/%s", category.ID)
+	url, err := addOptions(apiEndpoint, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodPut, url, category)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pc := new(ProjectCategory)
+	resp, err := s.client.Do(req, pc)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return nil, resp, jerr
+	}
+
+	return pc, resp, nil
+}
+
+func (s *ProjectService) DeleteProjectCategory(ctx context.Context, categoryID string) (*Response, error) {
+	apiEndpoint := fmt.Sprintf("/rest/api/3/projectCategory/%s", categoryID)
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodDelete, apiEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		jerr := NewJiraError(resp, err)
+		return resp, jerr
+	}
+
+	return resp, nil
 }
