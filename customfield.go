@@ -22,7 +22,7 @@ type CustomFieldContextOptionList struct {
 }
 
 type CustomFieldContextOption struct {
-	Id       string `json:"id,omitempty" structs:"id,omitempty"`
+	ID       string `json:"id,omitempty" structs:"id,omitempty"`
 	Value    string `json:"value,omitempty" structs:"value,omitempty"`
 	OptionID string `json:"optionId,omitempty" structs:"optionId,omitempty"`
 	Disabled bool   `json:"disabled,omitempty" structs:"disabled,omitempty"`
