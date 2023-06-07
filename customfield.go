@@ -35,7 +35,7 @@ type CustomFieldContextOptions struct {
 
 func (s *FieldService) GetCustomFieldOptions(ctx context.Context, fieldID string) (*CustomFieldOption, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/3/customFieldOption/%s", fieldID)
-	req, err := s.client.NewRequestWithContext(ctx, "GET", apiEndpoint, nil)
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, apiEndpoint, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,8 +48,8 @@ func (s *FieldService) GetCustomFieldOptions(ctx context.Context, fieldID string
 	return entity, resp, nil
 }
 func (s *FieldService) GetCustomFieldOptionContext(ctx context.Context, fieldID string, contextID string) (*CustomFieldContextOptionList, *Response, error) {
-	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s", fieldID, contextID)
-	req, err := s.client.NewRequestWithContext(ctx, "GET", apiEndpoint, nil)
+	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s/option", fieldID, contextID)
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, apiEndpoint, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -62,7 +62,7 @@ func (s *FieldService) GetCustomFieldOptionContext(ctx context.Context, fieldID 
 	return entity, resp, nil
 }
 func (s *FieldService) CreateCustomFieldOptionContext(ctx context.Context, fieldID string, contextID string, options *CustomFieldContextOptions) (*CustomFieldContextOptions, *Response, error) {
-	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s", fieldID, contextID)
+	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s/option", fieldID, contextID)
 	req, err := s.client.NewRequestWithContext(ctx, http.MethodPost, apiEndpoint, options)
 	if err != nil {
 		return nil, nil, err
@@ -76,7 +76,7 @@ func (s *FieldService) CreateCustomFieldOptionContext(ctx context.Context, field
 	return entity, resp, nil
 }
 func (s *FieldService) UpdateCustomFieldOptionContext(ctx context.Context, fieldID string, contextID string, options *CustomFieldContextOptions) (*CustomFieldContextOptions, *Response, error) {
-	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s", fieldID, contextID)
+	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s/option", fieldID, contextID)
 	req, err := s.client.NewRequestWithContext(ctx, http.MethodPut, apiEndpoint, options)
 	if err != nil {
 		return nil, nil, err
