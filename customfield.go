@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 type CustomFieldOption struct {
@@ -33,6 +35,13 @@ type CustomFieldContextOptions struct {
 	Options []CustomFieldContextOption `json:"options,omitempty"`
 }
 
+type CustomFieldListOptions struct {
+	OptionID    string `url:"optionId,omitempty"`
+	OnlyOptions bool   `url:"onlyOptions,omitempty"`
+	StartAt     int    `url:"startAt,omitempty"`
+	MaxResults  int    `url:"maxResults,omitempty"`
+}
+
 func (s *FieldService) GetCustomFieldOptions(ctx context.Context, fieldID string) (*CustomFieldOption, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/3/customFieldOption/%s", fieldID)
 	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, apiEndpoint, nil)
@@ -47,9 +56,26 @@ func (s *FieldService) GetCustomFieldOptions(ctx context.Context, fieldID string
 	}
 	return entity, resp, nil
 }
-func (s *FieldService) GetCustomFieldOptionContext(ctx context.Context, fieldID string, contextID string) (*CustomFieldContextOptionList, *Response, error) {
+func (s *FieldService) GetCustomFieldOptionContext(ctx context.Context, fieldID string, contextID string, options *CustomFieldListOptions) (*CustomFieldContextOptionList, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/api/3/field/%s/context/%s/option", fieldID, contextID)
-	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, apiEndpoint, nil)
+
+	u := url.URL{
+		Path: apiEndpoint,
+	}
+
+	uv := url.Values{}
+	if options != nil {
+		if options.StartAt != 0 {
+			uv.Add("startAt", strconv.Itoa(options.StartAt))
+		}
+		if options.MaxResults != 0 {
+			uv.Add("maxResults", strconv.Itoa(options.MaxResults))
+		}
+	}
+
+	u.RawQuery = uv.Encode()
+
+	req, err := s.client.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, nil, err
 	}
